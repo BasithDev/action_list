@@ -75,7 +75,7 @@ const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }
             <CSSTransition key="no-data" timeout={300} classNames="no-data">
               <div className="noData">
                 <PiSmileySad style={{fontSize:"80px",margin:"16px 0px"}} />
-                <p style={{fontSize:"28px"}}>No items to display...</p>
+                <p style={{fontSize:"28px"}}>No Tasks to display...</p>
               </div>
             </CSSTransition>
           ) : null}
