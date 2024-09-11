@@ -6,7 +6,6 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useState, useEffect } from 'react';
 
 const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }) => {
-  // const noDataImg = 'https://i.ibb.co/rsWL99H/Screenshot-2024-09-08-161243.png';
   const [editMode, setEditMode] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [showNoData, setShowNoData] = useState(false);
@@ -22,13 +21,13 @@ const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }
     }
   }, [todoPasser]);
 
-  const handleEditClick = (index, currentValue) => {
-    setEditMode(index);
+  const handleEditClick = (id, currentValue) => {
+    setEditMode(id);
     setEditValue(currentValue);
   };
 
-  const saveEdit = (index) => {
-    editTodo(index, editValue);
+  const saveEdit = (id) => {
+    editTodo(id, editValue);
     setEditMode(null);
   };
 
@@ -37,13 +36,13 @@ const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }
       <ul>
         <TransitionGroup>
           {todoPasser.length !== 0 ? (
-            todoPasser.map((todo, index) => (
-              <CSSTransition key={index} timeout={300} classNames="todo-item">
+            todoPasser.map(todo => (
+              <CSSTransition key={todo.id} timeout={300} classNames="todo-item">
                 <li>
                   <div style={{
-                    textDecoration: completedTodos[index] ? 'line-through' : 'none'
+                    textDecoration: completedTodos[todo.id] ? 'line-through' : 'none'
                   }}>
-                    {editMode === index ? (
+                    {editMode === todo.id ? (
                       <input
                         className='editBox'
                         type="text"
@@ -51,31 +50,31 @@ const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }
                         onChange={(e) => setEditValue(e.target.value)}
                       />
                     ) : (
-                      todo
+                      todo.text
                     )}
                   </div>
                   <div>
-                    {completedTodos[index] ? (
-                      <MdCheckBox onClick={() => toggleComplete(index)} />
+                    {completedTodos[todo.id] ? (
+                      <MdCheckBox onClick={() => toggleComplete(todo.id)} />
                     ) : (
-                      <MdCheckBoxOutlineBlank onClick={() => toggleComplete(index)} />
+                      <MdCheckBoxOutlineBlank onClick={() => toggleComplete(todo.id)} />
                     )}
 
-                    {editMode === index ? (
-                      <MdOutlineDone onClick={() => saveEdit(index)} />
+                    {editMode === todo.id ? (
+                      <MdOutlineDone onClick={() => saveEdit(todo.id)} />
                     ) : (
-                      <MdModeEdit onClick={() => handleEditClick(index, todo)} />
+                      <MdModeEdit onClick={() => handleEditClick(todo.id, todo.text)} />
                     )}
 
-                    <TiDelete onClick={() => delTodo(index)} />
+                    <TiDelete onClick={() => delTodo(todo.id)} />
                   </div>
                 </li>
               </CSSTransition>
-            ))
+            )).reverse()
           ) : showNoData ? (
             <CSSTransition key="no-data" timeout={300} classNames="no-data">
               <div className="noData">
-              <PiSmileySad style={{fontSize:"80px",margin:"16px 0px"}} />
+                <PiSmileySad style={{fontSize:"80px",margin:"16px 0px"}} />
                 <p style={{fontSize:"28px"}}>No items to display...</p>
               </div>
             </CSSTransition>
@@ -87,7 +86,10 @@ const Todos = ({ todoPasser, delTodo, editTodo, completedTodos, toggleComplete }
 };
 
 Todos.propTypes = {
-  todoPasser: PropTypes.arrayOf(PropTypes.string).isRequired,
+  todoPasser: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    text: PropTypes.string.isRequired
+  })).isRequired,
   delTodo: PropTypes.func.isRequired,
   editTodo: PropTypes.func.isRequired,
   completedTodos: PropTypes.object.isRequired,

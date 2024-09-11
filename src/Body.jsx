@@ -14,32 +14,46 @@ const Body = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todoPasser));
-    localStorage.setItem("completedTodos", JSON.stringify(completedTodos));
+    if (todoPasser.length === 0) {
+      localStorage.removeItem("todos");
+      localStorage.removeItem("completedTodos");
+    } else {
+      localStorage.setItem("todos", JSON.stringify(todoPasser));
+      localStorage.setItem("completedTodos", JSON.stringify(completedTodos));
+    }
   }, [todoPasser, completedTodos]);
 
   const addTodo = (val) => {
-    const tempArr = [...todoPasser, val].reverse();
-    setTodoPasser(tempArr);
+    const newTodo = { id: Date.now(), text: val };
+    setTodoPasser(prevTodos => [...prevTodos, newTodo]);
   };
 
   const delTodo = (id) => {
-    const tempArr = todoPasser.filter((_, i) => id !== i);
-    setTodoPasser(tempArr);
+    const updatedTodos = todoPasser.filter(todo => todo.id !== id);
+    setTodoPasser(updatedTodos);
     const updatedCompletedTodos = { ...completedTodos };
     delete updatedCompletedTodos[id];
     setCompletedTodos(updatedCompletedTodos);
+    if (updatedTodos.length === 0) {
+      localStorage.removeItem('todos');
+      localStorage.removeItem('completedTodos');
+    } else {
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
+      localStorage.setItem('completedTodos', JSON.stringify(updatedCompletedTodos));
+    }
   };
 
-  const editTodo = (index, newValue) => {
-    const updatedTodos = todoPasser.map((todo, i) => (i === index ? newValue : todo));
+  const editTodo = (id, newValue) => {
+    const updatedTodos = todoPasser.map(todo => 
+      todo.id === id ? { ...todo, text: newValue } : todo
+    );
     setTodoPasser(updatedTodos);
   };
 
-  const toggleComplete = (index) => {
+  const toggleComplete = (id) => {
     setCompletedTodos(prev => ({
       ...prev,
-      [index]: !prev[index],
+      [id]: !prev[id],
     }));
   };
 
